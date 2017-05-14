@@ -1,0 +1,422 @@
+<template>
+  <div class="fp-cont container-fluid" id="fp-cont">
+    <div class="fp-cont-overlay" id="fp-cont-overlay"> <!-- second bg for image rotation -->
+    </div>
+      <div class="row">
+      <div class="col-xs-10 col-xs-offset-1 col-md-4 col-md-offset-7">
+        <div class="fp-welcome">
+          <h1>Welcome to StockTrader.</h1>
+        </div>
+        <div class="fp-form login">
+          <h4>Login:</h4>
+            <div class="form-group">
+              <div class="input-group">
+                <input type="text" class="form-control" id="login-user" 
+                  placeholder="Username" v-model="login.username">
+                <div class="input-group-addon" v-if="login.username">
+                  <span class="glyphicon glyphicon-ok-circle input-ok" v-if="login.correctUser === true"></span>
+                  <span class="glyphicon glyphicon-remove-circle input-nok" v-else></span>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="input-group">
+                <input type="password" class="form-control" id="login-password" 
+                  placeholder="Password" v-model="login.password">
+                  <div class="input-group-addon" v-if="login.password">
+                    <span class="glyphicon glyphicon-ok-circle input-ok" v-if="login.correctPassword === true"></span>
+                    <span class="glyphicon glyphicon-remove-circle input-nok" v-else></span>
+                  </div>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Login</button>
+            <span>Forgot password</span>
+          </form>
+        </div>
+        <div class="fp-form register">
+          <h4>New to StockTrader? Register here:</h4>
+          <form>
+            <div class="form-group">
+              <div class="input-group">
+                <input type="text" class="form-control" id="register-user" 
+                  placeholder="Username" v-model="register.username">
+                <div class="input-group-addon" v-if="register.username">
+                  <span class="glyphicon glyphicon-ok-circle input-ok" v-if="login.correctUsername === true"></span>
+                  <span class="glyphicon glyphicon-remove-circle input-nok" v-else></span>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="input-group">
+                <input type="email" class="form-control" id="register-user" 
+                   placeholder="Email" v-model="register.email">
+                <div class="input-group-addon" v-if="register.email">
+                  <span class="glyphicon glyphicon-ok-circle input-ok" v-if="login.correctPassword === true"></span>
+                  <span class="glyphicon glyphicon-remove-circle input-nok" v-else></span>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="input-group">
+                <input type="password" class="form-control" id="register-password" 
+                  placeholder="Password" v-model="register.password">
+                <div class="input-group-addon" v-if="register.password">
+                  <span class="glyphicon glyphicon-ok-circle input-ok" v-if="register.correctPassword.overall"></span>
+                  <span class="glyphicon glyphicon-remove-circle input-nok" v-else></span>
+                </div>
+                <div class="input-group-addon generate-pwd" @click="generatePwd()">Generate</div>
+              </div>
+              <div class="generated-pwd" 
+                :class="{ 'generated-pwd-ok': generatedPwdMatchesInput }" 
+                v-if="generatedPwd">{{ generatedPwd }}</div>
+              <table v-if="register.password" class="registerPwdCheck">
+                <thead>
+                  <th class="desc"></th>
+                  <th class="checkIcon"></th>
+                </thead>
+                <tbody>
+                  <col width="60px">
+                  <col width="10px">
+                  <tr>
+                  <td colspan="2">
+                    Password Requirements:
+                  </td>
+                  </tr>
+                  <tr>
+                  <td>
+                    1 uppercase letter (A-Z)
+                  </td>
+                  <td>
+                    <span class="glyphicon glyphicon-ok-circle input-ok" v-if="register.correctPassword.uppercase === true"></span>
+                    <span class="glyphicon glyphicon-remove-circle input-nok" v-else></span>
+                  </td>
+                  </tr>
+                  <tr>
+                  <td>
+                    1 lowercase letter (a-z)
+                  </td>
+                  <td>
+                    <span class="glyphicon glyphicon-ok-circle input-ok" v-if="register.correctPassword.lowercase === true"></span>
+                    <span class="glyphicon glyphicon-remove-circle input-nok" v-else></span>
+                  </td>
+                  </tr>
+                  <tr>
+                  <td>
+                    1 number (0-9)
+                  </td>
+                  <td>
+                    <span class="glyphicon glyphicon-ok-circle input-ok" v-if="register.correctPassword.number === true"></span>
+                    <span class="glyphicon glyphicon-remove-circle input-nok" v-else></span>
+                  </td>
+                  </tr>
+                  <tr>
+                  <td>
+                    7 characters
+                  </td>
+                  <td>
+                    <span class="glyphicon glyphicon-ok-circle input-ok" v-if="register.correctPassword.pwdlength === true"></span>
+                    <span class="glyphicon glyphicon-remove-circle input-nok" v-else></span>
+                  </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <button type="submit" class="btn btn-primary">Register</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+var $ = require('jquery')
+var generatePassword = require('password-generator')
+
+export default {
+  data () {
+    var imgsList = ['1.jpg', '2.jpg', '3.jpg', '4.jpg']
+    var currentImg = Math.floor(Math.random() * imgsList.length)
+    return {
+      img: {
+        bgCont: '#fp-cont',
+        bgOverlay: '#fp-cont-overlay',
+        imgsList: imgsList,
+        currentImg: currentImg,
+        bgImgRes: 1,
+        res1k: 1500,
+        res2k: 2000,
+        res3k: 3000,
+        res4k: 4000
+      },
+      generatedPwd: false,
+      generatedPwdMatchesInput: false,
+      login: {
+        username: null,
+        correctUser: false,
+        password: null,
+        correctPassword: false
+      },
+      register: {
+        username: null,
+        correctUser: null,
+        email: null,
+        correctEmail: null,
+        password: null,
+        correctPassword: {
+          overall: false,
+          uppercase: false,
+          lowercase: false,
+          digit: false
+        }
+      },
+      loginClicked: false,
+      registerClicked: false
+    }
+  },
+
+  watch: {
+    'login.password': function (val) {
+      this.login.correctPassword = this.validateInput('password', val).overall
+    },
+    'register.username': function (val) {
+      console.log('username')
+    },
+    'register.email': function (val) {
+      this.register.correctEmail = this.checkEmail(val)
+    },
+    'register.password': function (val) {
+      this.register.correctPassword = this.validateInput('password', val)
+      if (this.register.password === this.generatedPwd) {
+        this.generatedPwdMatchesInput = true
+      }
+    }
+  },
+
+  methods: {
+    enableForm (which) {
+      if (which === 'login') {
+        this.loginClicked = true
+      } else {
+        this.registerClicked = true
+      }
+    },
+    validateInput (type, value) {
+      /* eslint-disable no-useless-escape */
+
+      /* password, username, email check */
+
+      var types = {
+        password () {
+          var minlength = 7
+          var maxlength = 30
+          var results = {
+            overall: false,
+            uppercase: false,
+            lowercase: false,
+            number: false,
+            pwdlength: false
+          }
+
+          var re = {
+            uppercase: /([A-Z])/g,
+            lowercase: /([a-z])/g,
+            number: /([\d])/g
+          }
+          for (let i in re) {
+            var match = value.match(re[i])
+            if (match !== null) {
+              results[i] = true
+            }
+          }
+
+          if (value.length >= minlength && value.length < maxlength) results.pwdlength = true
+
+          if (results.uppercase === true && results.lowercase === true &&
+              results.number === true && results.pwdlength === true) results.overall = true
+
+          return $.extend({}, results)
+        },
+        email () {
+
+        },
+        username () {
+
+        }
+      }
+      if (types.hasOwnProperty(type)) {
+        return types[type]()
+      }
+    },
+    loadBgImg (elem, resNum, imgName) {
+      var resFolders = {
+        1: '1k',
+        2: '2k',
+        3: '3k',
+        4: '4k'
+      }
+      var bg = 'center/cover url("/static/images/fp-bg/' + resFolders[resNum] + '/' + imgName + '")'
+      $(elem).css('background', bg)
+    },
+
+    adjustBgImgRes () {
+      var width = $(window).width()
+
+      var res3k = this.img.res3k
+      var res2k = this.img.res2k
+      var res1k = this.img.res1k
+
+      if (width > res3k) {
+        this.img.bgImgRes = 4
+      } else if (width > res2k && res3k > width) {
+        this.img.bgImgRes = 3
+      } else if (width > res1k && res2k > width) {
+        this.img.bgImgRes = 2
+      } else if (res1k > width) {
+        this.img.bgImgRes = 1
+      }
+    },
+
+    initBg () {
+      this.loadBgImg(this.img.bgCont, this.img.bgImgRes, this.img.imgsList[this.img.currentImg])
+      this.loadBgImg(this.img.bgOverlay, this.img.bgImgRes, this.img.imgsList[this.img.currentImg])
+    },
+
+    rotateBgImgs () {
+      var bgOverlay = this.img.bgOverlay
+      var bgCont = this.img.bgCont
+      var _v = this
+      var imgsList = this.img.imgsList
+
+      var currentImg = this.img.currentImg
+
+      var rotate = function () {
+        currentImg = (currentImg + 1) % imgsList.length
+        _v.loadBgImg(bgOverlay, 1, imgsList[currentImg])
+        $(bgOverlay).css('display', 'block')
+        $(bgOverlay).animate({
+          opacity: '1'
+        }, 1000, function () {
+          _v.loadBgImg(bgCont, _v.img.bgImgRes, imgsList[currentImg])
+          $(bgOverlay).css('opacity', 0)
+          $(bgOverlay).hide()
+        })
+      }
+      setInterval(rotate, 7000)
+    },
+
+    generatePwd () {
+      this.generatedPwd = true
+      var pwd
+      do {
+        pwd = generatePassword(7, false)
+      } while (this.validateInput('password', pwd).overall === false)
+      this.generatedPwd = pwd
+    }
+  },
+
+  created () {
+    window.addEventListener('resize', this.adjustBgImgRes)
+  },
+
+  mounted () {
+    this.adjustBgImgRes()
+    this.initBg()
+    this.rotateBgImgs()
+  },
+
+  beforeDestroy () {
+    window.removeEventListener('resize', this.adjustBgImgRes)
+  }
+
+}
+</script>
+
+<style lang="scss">
+   @import url('https://fonts.googleapis.com/css?family=Gudea');
+  .fp-cont {
+    font-family: 'Gudea', sans-serif;
+    color: #1b678e;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    padding: 0;
+    .row {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  .generate-pwd {
+    cursor: pointer;
+    user-select: none !important;
+  }
+
+  table.registerPwdCheck {
+    th.desc {
+      width: 80%;
+    }
+    th.checkIcon {
+      width: 20%;
+    }
+    td {
+      padding: 0 0.4em;
+    }
+  }
+
+  .input-ok {
+    color: green;
+  }
+  .input-nok {
+    color: red;
+  }
+  .input-group {
+    width: 100%;
+  }
+
+  .generated-pwd {
+    font-family: 'Times New Roman';
+    float: right;
+    color: red;
+    font-size: 1.4em;
+    letter-spacing: 0.1em;
+    user-select: none;
+    cursor: default;
+  }
+  .generated-pwd-ok {
+    color: green;
+  }
+
+  .fp-cont-overlay {
+    display: none;
+    opacity: 0;
+    margin: 0;
+    background-color: white;
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  div.fp-welcome {
+    margin-top: 3vh;
+    font-size: 3em;
+    text-align: center;
+    h1 {
+      background-color: rgba(255,255,255,0.6);
+      padding: 0.3em;
+      border: 1px solid black;
+    }
+  }
+
+  .fp-form {
+    color: black;
+    background-color: rgba(255,255,255,0.6);
+    padding: 1.3vw 3vw;
+    border: 1px solid black;
+    margin-top: 0.5vh;
+  }
+
+  .fp-register {
+
+  }
+</style>

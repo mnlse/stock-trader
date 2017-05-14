@@ -1,0 +1,6 @@
+      login: {
+        username: null,
+        correctUser: false,
+        password: null,
+        correctPassword: false
+      },

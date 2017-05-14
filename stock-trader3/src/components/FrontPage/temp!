@@ -1,0 +1,9 @@
+
+    generatePwd () {
+      this.generatedPwd = true
+      var pwd
+      do {
+        pwd = generatePassword(7, false)
+      } while (this.validateInput('password', pwd).overall === false)
+      this.generatedPwd = pwd
+    }
